@@ -12,10 +12,10 @@ from ssh_detector.__main__ import main
 from ssh_detector.core import analyze_lines, parse_attempt
 
 
-def log_line(time: str, ip: str = "198.51.100.23") -> str:
+def log_line(time: str, ip: str = "198.51.100.23", port: int = 41200) -> str:
     return (
         f"Nov 14 {time} host sshd[4312]: "
-        f"Failed password for invalid user admin from {ip} port 41200 ssh2\n"
+        f"Failed password for invalid user admin from {ip} port {port} ssh2\n"
     )
 
 
@@ -38,6 +38,14 @@ class ParserTests(unittest.TestCase):
 
     def test_rejects_invalid_source_ip(self):
         self.assertIsNone(parse_attempt(log_line("10:00:00", "not-an-ip"), 2026))
+
+    def test_accepts_valid_source_port_boundaries(self):
+        self.assertIsNotNone(parse_attempt(log_line("10:00:00", port=1), 2026))
+        self.assertIsNotNone(parse_attempt(log_line("10:00:00", port=65535), 2026))
+
+    def test_rejects_out_of_range_source_ports(self):
+        self.assertIsNone(parse_attempt(log_line("10:00:00", port=0), 2026))
+        self.assertIsNone(parse_attempt(log_line("10:00:00", port=65536), 2026))
 
     def test_rejects_invalid_timestamp(self):
         self.assertIsNone(parse_attempt(log_line("25:00:00"), 2026))

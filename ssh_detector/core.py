@@ -13,7 +13,7 @@ FAILED_PASSWORD = re.compile(
     r"^(?P<month>[A-Z][a-z]{2})\s+(?P<day>\d{1,2})\s+"
     r"(?P<time>\d{2}:\d{2}:\d{2})\s+\S+\s+sshd\[\d+\]: "
     r"Failed password for (?:invalid user )?(?P<username>\S+) from "
-    r"(?P<ip>\S+) port \d+\b"
+    r"(?P<ip>\S+) port (?P<port>\d+)\b"
 )
 
 
@@ -41,6 +41,9 @@ def parse_attempt(line: str, year: int) -> Attempt | None:
 
     try:
         address = str(ipaddress.ip_address(match.group("ip")))
+        port = int(match.group("port"))
+        if not 1 <= port <= 65535:
+            return None
         moment = datetime.strptime(
             f'{year} {match.group("month")} {match.group("day")} {match.group("time")}',
             "%Y %b %d %H:%M:%S",

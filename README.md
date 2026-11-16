@@ -17,7 +17,7 @@ The sample file contains synthetic SSH logs and documentation IP addresses.
 
 ## Method
 
-The parser handles traditional Linux syslog `sshd[PID]: Failed password` events, validates IPv4/IPv6 source addresses, and counts failed attempts per source within a rolling window. Findings include the peak window, failed-attempt count and distinct usernames targeted. An alert is an investigation signal, not proof of an intrusion.
+The parser handles traditional Linux syslog `sshd[PID]: Failed password` events, validates IPv4/IPv6 source addresses and TCP source ports (`1`–`65535`), and counts failed attempts per source within a rolling window. Findings include the peak window, failed-attempt count and distinct usernames targeted. An alert is an investigation signal, not proof of an intrusion.
 
 **Limits:** This is not a live intrusion prevention system. Syslog records need an explicit log year (`--year`); analyze rotated logs and year boundaries separately. Input formats such as journald JSON are not supported. Never publish real authentication logs or credentials.
 
